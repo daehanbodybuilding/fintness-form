@@ -177,10 +177,10 @@
         }
 
         .success-message {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
+    background-color: #000000;
+    color: #ffffff;
+    border: 1px solid #ff7a00;
+}
 
         .error-message {
             background-color: #f8d7da;
@@ -246,11 +246,11 @@
         }
 
         .success-message h3 {
-            color: #155724;
-            font-size: 22px;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
+    color: #ffffff;
+    font-size: 22px;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
 
         .benefit-text {
             font-size: 15px;
@@ -289,12 +289,33 @@
         }
 
         .sub-text {
-            font-size: 13px;
-            color: #155724;
-            margin-top: 10px;
-            opacity: 0.8;
-        }
-   
+    font-size: 13px;
+    color: #ffffff;
+    margin-top: 10px;
+    opacity: 0.8;
+}
+   .reset-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: transparent;
+    color: #ffffff;
+    border: 2px solid #ff7a00;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+}
+
+.reset-btn:hover {
+    background-color: #ff7a00;
+    transform: translateY(-2px);
+}
+
+.reset-btn:active {
+    transform: translateY(0);
+}
     </style>
 </head>
 <body>
@@ -363,9 +384,12 @@
                 특별 혜택을 바로 제공해드립니다.
             </p>
             <button class="kakao-btn" onclick="window.open('http://pf.kakao.com/_qpHxgn', '_blank')">
-                💬 카카오톡 상담하기
-            </button>
-            <p class="sub-text">지금 바로 상담받으세요!</p>
+    💬 카카오톡 상담하기
+</button>
+<p class="sub-text">지금 바로 상담받으세요!</p>
+<button class="reset-btn" onclick="location.reload()">
+    ↺ 처음으로 돌아가기
+</button>
         </div>
 
         <div class="error-message" id="errorMessage">
@@ -431,12 +455,7 @@
                     loading.classList.remove('active');
                     successMessage.classList.add('active');
                     
-                    setTimeout(() => {
-                        form.reset();
-                        form.style.display = 'block';
-                        successMessage.classList.remove('active');
-                        submitBtn.disabled = false;
-                    }, 3000);
+              
                 }, 1500);
 
             } catch (error) {
