@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상담 신청하기 - Gemstone Fitness</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orange-bright: #FF8C00;
+            --orange-dark: #A85A00;
+            --orange-glow: rgba(255, 140, 0, 0.25);
+            --orange-subtle: rgba(255, 140, 0, 0.08);
+            --bg-deep: #050505;
+            --bg-card: #111111;
+            --bg-input: #0a0a0a;
+            --border-default: #1f1f1f;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --text-muted: #555555;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-deep);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -40%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 140, 0, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 500px;
+            width: 100%;
+            animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero {
+            text-align: left;
+            padding: 0 4px;
+            margin-bottom: 36px;
+        }
+
+        /* ── 3D Logo ── */
+        .gem-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 32px;
+            width: fit-content;
+            perspective: 600px;
+        }
+
+        .gem-3d-wrap {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            margin-bottom: 12px;
+            animation: gemFloat 4s ease-in-out infinite;
+            transform-style: preserve-3d;
+        }
+
+        @keyframes gemFloat {
+            0%, 100% { transform: translateY(0) rotateY(0deg) rotateX(0deg); }
+            25% { transform: translateY(-5px) rotateY(4deg) rotateX(2deg); }
+            50% { transform: translateY(-8px) rotateY(0deg) rotateX(-1deg); }
+            75% { transform: translateY(-4px) rotateY(-4deg) rotateX(1deg); }
+        }
+
+        /* Back shadow layer (depth) */
+        .gem-shadow {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 80px;
+            height: 80px;
+            filter: blur(1px) brightness(0.3);
+            opacity: 0.5;
+            transform: translateZ(-8px);
+        }
+
+        /* Mid layer */
+        .gem-mid {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 80px;
+            height: 80px;
+            filter: brightness(0.55) saturate(1.2);
+            opacity: 0.6;
+            transform: translateZ(-4px);
+        }
+
+        /* Front layer (main) */
+        .gem-front {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 80px;
+            height: 80px;
+            transform: translateZ(0px);
+            filter: drop-shadow(0 4px 16px rgba(255, 140, 0, 0.35))
+                    drop-shadow(0 0 30px rgba(255, 140, 0, 0.15));
+        }
+
+        /* Highlight layer (top glow) */
+        .gem-highlight {
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            width: 80px;
+            height: 80px;
+            filter: brightness(1.8) saturate(0.5) blur(0.5px);
+            opacity: 0.15;
+            transform: translateZ(2px);
+            mix-blend-mode: screen;
+        }
+
+        /* Ambient glow behind logo */
+        .gem-3d-wrap::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120px;
+            height: 120px;
+            transform: translate(-50%, -50%) translateZ(-12px);
+            background: radial-gradient(circle, rgba(255, 140, 0, 0.2) 0%, transparent 65%);
+            border-radius: 50%;
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) translateZ(-12px) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -50%) translateZ(-12px) scale(1.1); }
+        }
+
+        /* Floor reflection */
+        .gem-3d-wrap::after {
+            content: '';
+            position: absolute;
+            bottom: -18px;
+            left: 50%;
+            width: 60px;
+            height: 8px;
+            transform: translateX(-50%);
+            background: radial-gradient(ellipse, rgba(255, 140, 0, 0.18) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .gem-logo-text {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Logo SVG inline styles */
+        .gem-svg-logo {
+            width: 100%;
+            height: 100%;
+        }
+
+        .gem-svg-logo .fill-main {
+            fill: #FF7700;
+        }
+
+        .gem-svg-logo .stroke-main {
+            fill: #FF7700;
+            stroke: #FF7700;
+            stroke-miterlimit: 10;
+        }
+
+        /* ── Headline ── */
+        .headline {
+            font-size: 34px;
+            font-weight: 900;
+            line-height: 1.35;
+            letter-spacing: -0.5px;
+            margin-bottom: 14px;
+        }
+
+        .headline .line { display: block; }
+        .headline .dark-orange { color: var(--orange-dark); }
+        .headline .bright-orange { color: var(--orange-bright); }
+
+        .badge-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            background: var(--orange-subtle);
+            border: 1px solid rgba(255, 140, 0, 0.12);
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--orange-bright);
+        }
+
+        .badge .dot {
+            width: 5px;
+            height: 5px;
+            background: var(--orange-bright);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        /* ── Form Card ── */
+        .form-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: 20px;
+            padding: 32px 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 140, 0, 0.3), transparent);
+        }
+
+        .form-group { margin-bottom: 20px; }
+
+        .form-group label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .required { color: var(--orange-bright); margin-left: 2px; }
+
+        input[type="text"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 15px 16px;
+            background: var(--bg-input);
+            border: 1.5px solid var(--border-default);
+            border-radius: 14px;
+            font-size: 15px;
+            font-family: inherit;
+            color: var(--text-primary);
+            transition: all 0.25s ease;
+            -webkit-appearance: none;
+        }
+
+        input::placeholder { color: var(--text-muted); }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--orange-bright);
+            box-shadow: 0 0 0 3px var(--orange-glow);
+            background: #000;
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23FF8C00' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        select option { background: var(--bg-card); color: var(--text-primary); }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 17px;
+            background: var(--orange-bright);
+            color: #000;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin-top: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .submit-btn:hover {
+            background: #FFA033;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 140, 0, 0.3);
+        }
+
+        .submit-btn:hover::after { left: 100%; }
+        .submit-btn:active { transform: translateY(0); box-shadow: none; }
+        .submit-btn:disabled { background: #222; color: #555; cursor: not-allowed; transform: none; }
+
+        .privacy { text-align: center; margin-top: 20px; padding: 0 8px; }
+        .privacy p { font-size: 11px; color: #444; line-height: 1.7; }
+
+        .loading { display: none; text-align: center; padding: 40px 20px; }
+        .loading.active { display: block; }
+
+        .spinner {
+            width: 44px; height: 44px;
+            border: 3px solid #1a1a1a;
+            border-top-color: var(--orange-bright);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading p { color: var(--text-secondary); font-size: 14px; }
+
+        .success-message { display: none; text-align: center; padding: 20px 0; }
+        .success-message.active {
+            display: block;
+            animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .success-emoji { font-size: 52px; margin-bottom: 16px; display: block; }
+        .success-message h3 { color: var(--text-primary); font-size: 22px; font-weight: 800; margin-bottom: 16px; }
+        .success-message .benefit-text { font-size: 14px; line-height: 1.9; color: #aaa; }
+        .success-message .benefit-text .hl { color: var(--orange-bright); font-size: 17px; font-weight: 800; }
+
+        .kakao-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 14px 32px;
+            background: #FEE500;
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            margin: 24px 0 8px;
+            transition: all 0.25s ease;
+            text-decoration: none;
+        }
+
+        .kakao-btn:hover { background: #FDD835; transform: translateY(-2px); }
+        .sub-text { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+        .reset-btn {
+            display: inline-block;
+            padding: 11px 24px;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1.5px solid #2a2a2a;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: all 0.25s ease;
+        }
+
+        .reset-btn:hover { border-color: var(--orange-bright); color: var(--orange-bright); }
+
+        .error-message {
+            display: none;
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-top: 16px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+            background: rgba(255, 60, 60, 0.06);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 60, 60, 0.15);
+        }
+
+        .error-message.active { display: block; animation: fadeUp 0.4s ease; }
+
+        @media (max-width: 400px) {
+            .headline { font-size: 28px; }
+            .form-card { padding: 28px 22px; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <div class="gem-logo">
+                <div class="gem-3d-wrap">
+                    <!-- Layer 1: Deep shadow (back) -->
+                    <svg class="gem-svg-logo gem-shadow" viewBox="0 0 851 851" xmlns="http://www.w3.org/2000/svg">
+                        <g><path class="fill-main" d="M344.48,612.52v-279.16c0-2.37-1.92-4.3-4.3-4.3h-109.47c-3.44,0-5.49-3.85-3.56-6.7l36.17-53.61c.8-1.18,2.13-1.89,3.56-1.89h140.99c2.37,0,4.3,1.92,4.3,4.3v457.25c0,2.13-1.54,3.94-3.65,4.25-16.94,2.53-56.24,5.54-66.41-1.32-.39-.26-.7-.6-.98-.98L26.91,303.24c-.56-.76-.86-1.69-.83-2.64l.11-4.8c.03-1.15.51-2.24,1.35-3.03L214.68,116.62c.8-.75,1.85-1.17,2.95-1.17h405.53c.98,0,1.94.33,2.71.95,33.69,26.88,63.69,59.45,95.85,88.74h0c2.98,2.68,1.08,7.62-2.92,7.62h-84.36c-1.02,0-2-.33-2.77-1-11.93-10.26-26-31.78-41.62-34.23-.26-.04-.51-.06-.77-.06l-339.32.18c-1,0-1.96.34-2.74.97-46.06,37.42-86.87,81.12-130,121.93-1.03.97-1.51,2.38-1.29,3.78l1.32,8.36c.11.71.4,1.37.84,1.94,75.67,97.93,145.47,202.78,223.07,297.67.4.49.68,1.05.83,1.66l1.12,4.51,1.23-4.93c.08-.34.13-.69.13-1.04Z"/><path class="stroke-main" d="M510,273.67v17.69c0,3.33,2.7,6.03,6.03,6.03h302.86c3.99,0,6.87,3.8,5.81,7.64l-.2.73c-.21.77-.58,1.49-1.08,2.11-103.34,130.23-194.13,274.72-297.67,404.19-4.21,5.26-16.41,23.48-22.52,23.48h-54.9c-3.33,0-6.03-2.7-6.03-6.03v-239.48c0-3.33,2.7-6.03,6.03-6.03h56.02c3.18,0,5.85,2.46,6.02,5.63,2.18,39.83-5.94,80.83-3.09,120.18.29,4.03-2.1,7.83,4.02,6.7l181.1-247.19c2.93-4.01.04-9.64-4.93-9.59l-239.09,2.5c-3.35.04-6.09-2.67-6.09-6.03v-82.54c0-3.33,2.7-6.03,6.03-6.03h55.64c3.33,0,6.03,2.7,6.03,6.03Z"/></g><polygon class="fill-main" points="350.24 613.84 348.89 619.27 347.53 613.84 350.24 613.84"/>
+                    </svg>
+
+                    <!-- Layer 2: Mid depth -->
+                    <svg class="gem-svg-logo gem-mid" viewBox="0 0 851 851" xmlns="http://www.w3.org/2000/svg">
+                        <g><path class="fill-main" d="M344.48,612.52v-279.16c0-2.37-1.92-4.3-4.3-4.3h-109.47c-3.44,0-5.49-3.85-3.56-6.7l36.17-53.61c.8-1.18,2.13-1.89,3.56-1.89h140.99c2.37,0,4.3,1.92,4.3,4.3v457.25c0,2.13-1.54,3.94-3.65,4.25-16.94,2.53-56.24,5.54-66.41-1.32-.39-.26-.7-.6-.98-.98L26.91,303.24c-.56-.76-.86-1.69-.83-2.64l.11-4.8c.03-1.15.51-2.24,1.35-3.03L214.68,116.62c.8-.75,1.85-1.17,2.95-1.17h405.53c.98,0,1.94.33,2.71.95,33.69,26.88,63.69,59.45,95.85,88.74h0c2.98,2.68,1.08,7.62-2.92,7.62h-84.36c-1.02,0-2-.33-2.77-1-11.93-10.26-26-31.78-41.62-34.23-.26-.04-.51-.06-.77-.06l-339.32.18c-1,0-1.96.34-2.74.97-46.06,37.42-86.87,81.12-130,121.93-1.03.97-1.51,2.38-1.29,3.78l1.32,8.36c.11.71.4,1.37.84,1.94,75.67,97.93,145.47,202.78,223.07,297.67.4.49.68,1.05.83,1.66l1.12,4.51,1.23-4.93c.08-.34.13-.69.13-1.04Z"/><path class="stroke-main" d="M510,273.67v17.69c0,3.33,2.7,6.03,6.03,6.03h302.86c3.99,0,6.87,3.8,5.81,7.64l-.2.73c-.21.77-.58,1.49-1.08,2.11-103.34,130.23-194.13,274.72-297.67,404.19-4.21,5.26-16.41,23.48-22.52,23.48h-54.9c-3.33,0-6.03-2.7-6.03-6.03v-239.48c0-3.33,2.7-6.03,6.03-6.03h56.02c3.18,0,5.85,2.46,6.02,5.63,2.18,39.83-5.94,80.83-3.09,120.18.29,4.03-2.1,7.83,4.02,6.7l181.1-247.19c2.93-4.01.04-9.64-4.93-9.59l-239.09,2.5c-3.35.04-6.09-2.67-6.09-6.03v-82.54c0-3.33,2.7-6.03,6.03-6.03h55.64c3.33,0,6.03,2.7,6.03,6.03Z"/></g><polygon class="fill-main" points="350.24 613.84 348.89 619.27 347.53 613.84 350.24 613.84"/>
+                    </svg>
+
+                    <!-- Layer 3: Front (main) -->
+                    <svg class="gem-svg-logo gem-front" viewBox="0 0 851 851" xmlns="http://www.w3.org/2000/svg">
+                        <g><path class="fill-main" d="M344.48,612.52v-279.16c0-2.37-1.92-4.3-4.3-4.3h-109.47c-3.44,0-5.49-3.85-3.56-6.7l36.17-53.61c.8-1.18,2.13-1.89,3.56-1.89h140.99c2.37,0,4.3,1.92,4.3,4.3v457.25c0,2.13-1.54,3.94-3.65,4.25-16.94,2.53-56.24,5.54-66.41-1.32-.39-.26-.7-.6-.98-.98L26.91,303.24c-.56-.76-.86-1.69-.83-2.64l.11-4.8c.03-1.15.51-2.24,1.35-3.03L214.68,116.62c.8-.75,1.85-1.17,2.95-1.17h405.53c.98,0,1.94.33,2.71.95,33.69,26.88,63.69,59.45,95.85,88.74h0c2.98,2.68,1.08,7.62-2.92,7.62h-84.36c-1.02,0-2-.33-2.77-1-11.93-10.26-26-31.78-41.62-34.23-.26-.04-.51-.06-.77-.06l-339.32.18c-1,0-1.96.34-2.74.97-46.06,37.42-86.87,81.12-130,121.93-1.03.97-1.51,2.38-1.29,3.78l1.32,8.36c.11.71.4,1.37.84,1.94,75.67,97.93,145.47,202.78,223.07,297.67.4.49.68,1.05.83,1.66l1.12,4.51,1.23-4.93c.08-.34.13-.69.13-1.04Z"/><path class="stroke-main" d="M510,273.67v17.69c0,3.33,2.7,6.03,6.03,6.03h302.86c3.99,0,6.87,3.8,5.81,7.64l-.2.73c-.21.77-.58,1.49-1.08,2.11-103.34,130.23-194.13,274.72-297.67,404.19-4.21,5.26-16.41,23.48-22.52,23.48h-54.9c-3.33,0-6.03-2.7-6.03-6.03v-239.48c0-3.33,2.7-6.03,6.03-6.03h56.02c3.18,0,5.85,2.46,6.02,5.63,2.18,39.83-5.94,80.83-3.09,120.18.29,4.03-2.1,7.83,4.02,6.7l181.1-247.19c2.93-4.01.04-9.64-4.93-9.59l-239.09,2.5c-3.35.04-6.09-2.67-6.09-6.03v-82.54c0-3.33,2.7-6.03,6.03-6.03h55.64c3.33,0,6.03,2.7,6.03,6.03Z"/></g><polygon class="fill-main" points="350.24 613.84 348.89 619.27 347.53 613.84 350.24 613.84"/>
+                    </svg>
+
+                    <!-- Layer 4: Highlight sheen -->
+                    <svg class="gem-svg-logo gem-highlight" viewBox="0 0 851 851" xmlns="http://www.w3.org/2000/svg">
+                        <g><path class="fill-main" d="M344.48,612.52v-279.16c0-2.37-1.92-4.3-4.3-4.3h-109.47c-3.44,0-5.49-3.85-3.56-6.7l36.17-53.61c.8-1.18,2.13-1.89,3.56-1.89h140.99c2.37,0,4.3,1.92,4.3,4.3v457.25c0,2.13-1.54,3.94-3.65,4.25-16.94,2.53-56.24,5.54-66.41-1.32-.39-.26-.7-.6-.98-.98L26.91,303.24c-.56-.76-.86-1.69-.83-2.64l.11-4.8c.03-1.15.51-2.24,1.35-3.03L214.68,116.62c.8-.75,1.85-1.17,2.95-1.17h405.53c.98,0,1.94.33,2.71.95,33.69,26.88,63.69,59.45,95.85,88.74h0c2.98,2.68,1.08,7.62-2.92,7.62h-84.36c-1.02,0-2-.33-2.77-1-11.93-10.26-26-31.78-41.62-34.23-.26-.04-.51-.06-.77-.06l-339.32.18c-1,0-1.96.34-2.74.97-46.06,37.42-86.87,81.12-130,121.93-1.03.97-1.51,2.38-1.29,3.78l1.32,8.36c.11.71.4,1.37.84,1.94,75.67,97.93,145.47,202.78,223.07,297.67.4.49.68,1.05.83,1.66l1.12,4.51,1.23-4.93c.08-.34.13-.69.13-1.04Z"/><path class="stroke-main" d="M510,273.67v17.69c0,3.33,2.7,6.03,6.03,6.03h302.86c3.99,0,6.87,3.8,5.81,7.64l-.2.73c-.21.77-.58,1.49-1.08,2.11-103.34,130.23-194.13,274.72-297.67,404.19-4.21,5.26-16.41,23.48-22.52,23.48h-54.9c-3.33,0-6.03-2.7-6.03-6.03v-239.48c0-3.33,2.7-6.03,6.03-6.03h56.02c3.18,0,5.85,2.46,6.02,5.63,2.18,39.83-5.94,80.83-3.09,120.18.29,4.03-2.1,7.83,4.02,6.7l181.1-247.19c2.93-4.01.04-9.64-4.93-9.59l-239.09,2.5c-3.35.04-6.09-2.67-6.09-6.03v-82.54c0-3.33,2.7-6.03,6.03-6.03h55.64c3.33,0,6.03,2.7,6.03,6.03Z"/></g><polygon class="fill-main" points="350.24 613.84 348.89 619.27 347.53 613.84 350.24 613.84"/>
+                    </svg>
+                </div>
+                <span class="gem-logo-text">GEMSTONE</span>
+            </div>
+
+            <div class="headline">
+                <span class="line dark-orange">상담 신청하고</span>
+                <span class="line"><span class="bright-orange">6만원 상당의 혜택</span><span class="dark-orange">을</span></span>
+                <span class="line dark-orange">지금 받아가세요</span>
+            </div>
+
+            <div class="badge-row">
+                <span class="badge"><span class="dot"></span>24시간 운영</span>
+                <span class="badge"><span class="dot"></span>운동복 수건 무료</span>
+                <span class="badge"><span class="dot"></span>주차 무료</span>
+            </div>
+
+            <p class="subtitle">변화의 시작, 지금 바로 함께하세요</p>
+        </div>
+
+        <div class="form-card">
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="name">이름 <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" required placeholder="김남천" autocomplete="name">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">전화번호 <span class="required">*</span></label>
+                    <input type="tel" id="phone" name="phone" required placeholder="010-1234-5678" pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}" autocomplete="tel">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="trainer">선호 트레이너</label>
+                        <select id="trainer" name="trainer">
+                            <option value="">선택 안함</option>
+                            <option value="이기영">이기영</option>
+                            <option value="최인기">최인기</option>
+                            <option value="차준영">차준영</option>
+                            <option value="이주희">이주희</option>
+                            <option value="안희우">안희우</option>
+                            <option value="황성국">황성국</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="interest">관심 분야</label>
+                        <select id="interest" name="interest">
+                            <option value="">선택 안함</option>
+                            <option value="일상체력">일상체력</option>
+                            <option value="다이어트">다이어트</option>
+                            <option value="벌크업">벌크업</option>
+                            <option value="체형교정">체형교정</option>
+                            <option value="기능성운동">기능성운동</option>
+                            <option value="재활/통증">재활/통증</option>
+                            <option value="바디프로필">바디프로필</option>
+                            <option value="시합출전">시합출전</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">상담 신청하기</button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>신청서를 전송하고 있습니다...</p>
+            </div>
+
+            <div class="success-message" id="successMessage">
+                <span class="success-emoji">🎉</span>
+                <h3>신청이 완료되었습니다!</h3>
+                <p class="benefit-text">
+                    <span class="hl">6만원 상당의 혜택</span>을 준비해두었어요!<br>
+                    방문 시 성함을 말씀해주시면<br>
+                    특별 혜택을 바로 제공해드립니다.
+                </p>
+                <button class="kakao-btn" onclick="window.open('http://pf.kakao.com/_qpHxgn', '_blank')">
+                    💬 카카오톡 상담하기
+                </button>
+                <p class="sub-text">지금 바로 상담받으세요!</p>
+                <button class="reset-btn" onclick="location.reload()">↺ 처음으로 돌아가기</button>
+            </div>
+
+            <div class="error-message" id="errorMessage">
+                ❌ 전송 중 오류가 발생했습니다. 다시 시도해주세요.
+            </div>
+        </div>
+
+        <div class="privacy">
+            <p>🔒 방문 등록 전까지 개인정보는 사용되지 않습니다<br>미방문 시 30일 후 자동 삭제되며, 마케팅 용도로 절대 사용하지 않습니다.</p>
+        </div>
+    </div>
+
+    <script>
+        const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxjmklWOpJrb_hynKY65Q2xcOpTXWii1_u2SVvIOjtMCV0KDHGiUKSBLJzvYtmOXio/exec';
+
+        const form = document.getElementById('contactForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+
+        const phoneInput = document.getElementById('phone');
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            if (value.length <= 3) {
+                e.target.value = value;
+            } else if (value.length <= 7) {
+                e.target.value = value.slice(0, 3) + '-' + value.slice(3);
+            } else {
+                e.target.value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7, 11);
+            }
+        });
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            form.style.display = 'none';
+            loading.classList.add('active');
+            submitBtn.disabled = true;
+
+            const formData = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                trainer: document.getElementById('trainer').value || '선택 안함',
+                interest: document.getElementById('interest').value || '선택 안함',
+                timestamp: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })
+            };
+
+            try {
+                await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                setTimeout(() => {
+                    loading.classList.remove('active');
+                    successMessage.classList.add('active');
+                }, 1500);
+            } catch (error) {
+                console.error('Error:', error);
+                loading.classList.remove('active');
+                errorMessage.classList.add('active');
+                form.style.display = 'block';
+                submitBtn.disabled = false;
+                setTimeout(() => { errorMessage.classList.remove('active'); }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>
